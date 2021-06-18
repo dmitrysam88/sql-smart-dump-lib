@@ -6,11 +6,12 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "run": "node dist/index.js",
-    "start": "tsc --project tsconfig.json && node dist/index.js"
+    "start": "tsc --project tsconfig.json && node dist/index.js",
+    "prepublish": "tsc --project tsconfig.json"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^15.12.2",
     "typescript": "^4.3.2"
