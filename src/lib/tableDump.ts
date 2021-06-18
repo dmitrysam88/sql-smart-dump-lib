@@ -1,13 +1,15 @@
 import { Pool } from 'mysql2/promise';
 
-import { getDatabaseList, saveToFile, generateInsertCode } from './helper';
+import { getDatabaseList, saveToFile, generateInsertCode, ConnectionObject, getPoolConnection } from './helper';
 
 type DBTable = {
   db: string;
   name: string;
 }
 
-export default function tableDump(sqlFilesPath: string, db: Pool) {
+export default function tableDump(sqlFilesPath: string, connectionOptions: ConnectionObject) {
+
+  let db: Pool;
 
   async function getTable(dbName: string) {
     let tables: Array<DBTable>;
@@ -55,18 +57,26 @@ export default function tableDump(sqlFilesPath: string, db: Pool) {
   }
 
   async function saveAllTables() {
+    db = await getPoolConnection(connectionOptions);
+
     const dataBases: Array<string> = await getDatabaseList(db);
     const tables: Array<DBTable> = await getAllTables(dataBases);
 
     await saveTablesCreate(tables);
+
+    db.end();
   }
 
   async function saveAllTablesWithData() {
+    db = await getPoolConnection(connectionOptions);
+
     const dataBases: Array<string> = await getDatabaseList(db);
     const tables: Array<DBTable> = await getAllTables(dataBases);
 
     await saveTablesCreate(tables);
     await saveTablesData(tables);
+
+    db.end();
   }
 
   return { saveAllTables, saveAllTablesWithData }

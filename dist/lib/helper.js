@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readFromFile = exports.saveToFile = exports.generateInsertCode = exports.createDirIfNotExist = exports.getDatabaseList = void 0;
+exports.getPoolConnection = exports.readFromFile = exports.saveToFile = exports.generateInsertCode = exports.createDirIfNotExist = exports.getDatabaseList = void 0;
 const fs_1 = __importDefault(require("fs"));
 const util_1 = require("util");
+const promise_1 = __importDefault(require("mysql2/promise"));
 const moment_1 = __importDefault(require("moment"));
 const asyncExist = util_1.promisify(fs_1.default.exists);
 const asyncWrite = util_1.promisify(fs_1.default.writeFile);
@@ -67,4 +68,8 @@ async function readFromFile(sqlDirPath, filePath) {
 }
 exports.readFromFile = readFromFile;
 ;
+async function getPoolConnection(connectionOptions) {
+    return promise_1.default.createPool(connectionOptions);
+}
+exports.getPoolConnection = getPoolConnection;
 //# sourceMappingURL=helper.js.map

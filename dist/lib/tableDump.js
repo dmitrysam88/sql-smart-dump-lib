@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const helper_1 = require("./helper");
-function tableDump(sqlFilesPath, db) {
+function tableDump(sqlFilesPath, connectionOptions) {
+    let db;
     async function getTable(dbName) {
         let tables;
         const res = await db.query(`SHOW TABLE STATUS FROM ${dbName};`);
@@ -37,15 +38,19 @@ function tableDump(sqlFilesPath, db) {
         }));
     }
     async function saveAllTables() {
+        db = await helper_1.getPoolConnection(connectionOptions);
         const dataBases = await helper_1.getDatabaseList(db);
         const tables = await getAllTables(dataBases);
         await saveTablesCreate(tables);
+        db.end();
     }
     async function saveAllTablesWithData() {
+        db = await helper_1.getPoolConnection(connectionOptions);
         const dataBases = await helper_1.getDatabaseList(db);
         const tables = await getAllTables(dataBases);
         await saveTablesCreate(tables);
         await saveTablesData(tables);
+        db.end();
     }
     return { saveAllTables, saveAllTablesWithData };
 }

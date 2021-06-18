@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const helper_1 = require("./helper");
-function routineDump(sqlFilesPath, db) {
+function routineDump(sqlFilesPath, connectionOptions) {
+    let db;
     async function getRoutine(routineType) {
         let routineList;
         const res = await db.query(`SHOW ${routineType.toUpperCase()} STATUS;`);
@@ -15,6 +16,7 @@ function routineDump(sqlFilesPath, db) {
         return res.reduce((acc, el) => acc.concat(el), []);
     }
     async function saveAllRoutines() {
+        db = await helper_1.getPoolConnection(connectionOptions);
         let routines = await getAllRoutine();
         await Promise.allSettled(routines.map(async (routine) => {
             const res = await db.query(`SHOW CREATE ${routine.type} ${routine.db}.${routine.name};`);
@@ -25,6 +27,7 @@ function routineDump(sqlFilesPath, db) {
             }
             return true;
         }));
+        db.end();
     }
     return { saveAllRoutines };
 }

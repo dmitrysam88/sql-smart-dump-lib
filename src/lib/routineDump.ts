@@ -1,6 +1,6 @@
 import { Pool } from 'mysql2/promise';
 
-import { saveToFile } from './helper';
+import { saveToFile, ConnectionObject, getPoolConnection } from './helper';
 
 type Routine = {
   db: string;
@@ -8,7 +8,9 @@ type Routine = {
   type: string;
 }
 
-export default function routineDump(sqlFilesPath: string, db: Pool) {
+export default function routineDump(sqlFilesPath: string, connectionOptions: ConnectionObject) {
+
+  let db: Pool;
 
   async function getRoutine(routineType: string): Promise<Routine[]> {
     let routineList: Array<Routine>;
@@ -29,6 +31,8 @@ export default function routineDump(sqlFilesPath: string, db: Pool) {
   }
 
   async function saveAllRoutines() {
+    db = await getPoolConnection(connectionOptions);
+
     let routines: Array<Routine> = await getAllRoutine();
 
     await Promise.allSettled(routines.map(async (routine: Routine): Promise<boolean> => {
@@ -42,6 +46,8 @@ export default function routineDump(sqlFilesPath: string, db: Pool) {
 
       return true;
     }));
+
+    db.end();
   }
 
   return { saveAllRoutines };

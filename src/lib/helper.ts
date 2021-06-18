@@ -1,13 +1,21 @@
 import fs from 'fs';
 import { promisify } from 'util';
 
-import { Pool } from 'mysql2/promise';
+import mysql, { Pool } from 'mysql2/promise';
 import moment from 'moment';
 
 const asyncExist = promisify(fs.exists);
 const asyncWrite = promisify(fs.writeFile);
 const asyncMkdir = promisify(fs.mkdir);
 const asyncRead = promisify(fs.readFile);
+
+export type ConnectionObject = {
+  host: string;
+  user: string;
+  password: string;
+  connectionLimit?: number;
+  database?: string;
+}
 
 export async function getDatabaseList(db: Pool): Promise<string[]> {
   let dbList: Array<string>;
@@ -68,3 +76,7 @@ export async function readFromFile(sqlDirPath: string, filePath: string) {
   }
   return undefined;
 };
+
+export async function getPoolConnection(connectionOptions: ConnectionObject): Promise<mysql.Pool> {
+  return mysql.createPool(connectionOptions);
+}

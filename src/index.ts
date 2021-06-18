@@ -4,31 +4,19 @@ import mysql, { Pool } from 'mysql2/promise';
 
 import routineDump from './lib/routineDump';
 import tableDump from './lib/tableDump';
+import { ConnectionObject } from './lib/helper';
 
-export type ConnectionObject = {
-  host: string;
-  user: string;
-  password: string;
-  connectionLimit?: number;
-  database?: string;
-}
-
-export default async function (sqlFilesPath: string, connectionOptions: ConnectionObject) {
-  if (!connectionOptions?.connectionLimit) {
-    connectionOptions.connectionLimit = 1;
-  }
-  const dbConnection: Pool = await mysql.createPool(connectionOptions);
-
+export default function (sqlFilesPath: string, connectionOptions: ConnectionObject) {
   return {
-    ...routineDump(sqlFilesPath, dbConnection),
-    ...tableDump(sqlFilesPath, dbConnection),
+    ...routineDump(sqlFilesPath, connectionOptions),
+    ...tableDump(sqlFilesPath, connectionOptions),
   }
 }
 
 // (async function () {
 //   const sqlDirPath = path.join(__dirname, '..', 'sql');
 
-//   const { saveAllRoutines, saveAllTables, saveAllTablesWithData } = await main(sqlDirPath, {
+//   const { saveAllRoutines, saveAllTables, saveAllTablesWithData } = main(sqlDirPath, {
 //     host: '192.168.201.221',
 //     user: 'root',
 //     password: '00!rtvc!00',
@@ -37,8 +25,4 @@ export default async function (sqlFilesPath: string, connectionOptions: Connecti
 
 //   await saveAllRoutines();
 //   await saveAllTables();
-
-//   process.exit(0);
-//   // await saveAllTablesWithData();
-
 // })();
