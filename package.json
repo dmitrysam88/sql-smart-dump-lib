@@ -2,12 +2,12 @@
   "name": "sql-smart-dump-lib",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "run": "node dist/index.js",
-    "start": "tsc --project tsconfig.json && node dist/index.js",
-    "prepublish": "tsc --project tsconfig.json"
+    "start": "npm run build && npm run run",
+    "prepublish": "npm run build"
   },
   "keywords": [],
   "author": "",
