@@ -1,11 +1,13 @@
 import { Pool } from 'mysql2/promise';
 
-import { getDatabaseList, saveToFile, generateInsertCode, ConnectionObject, getPoolConnection } from './helper';
+import { getDatabaseList, saveToFile, generateInsertCode, ConnectionObject, getPoolConnection, insertIntoText } from './helper';
 
 type DBTable = {
   db: string;
   name: string;
 }
+
+const createTemplate: string = 'CREATE TABLE ';
 
 export default function tableDump(sqlFilesPath: string, connectionOptions: ConnectionObject) {
 
@@ -48,7 +50,8 @@ export default function tableDump(sqlFilesPath: string, connectionOptions: Conne
       const res = await db.query(`SHOW CREATE TABLE ${table.db}.${table.name};`);
 
       if (res[0] && res[0][0] && (res[0][0]['Create Table'])) {
-        await saveToFile(sqlFilesPath, `${table.db}/TABLE`, `${table.name}.sql`, res[0][0]['Create Table']);
+        const createText: string = insertIntoText(res[0][0]['Create Table'], createTemplate, `\`${table.db}\`.`);
+        await saveToFile(sqlFilesPath, `${table.db}/TABLE`, `${table.name}.sql`, createText);
         console.log(`Save TABLE ${table.db}.${table.name}`);
       }
 

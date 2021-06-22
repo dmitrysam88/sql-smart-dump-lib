@@ -1,12 +1,17 @@
 import { Pool } from 'mysql2/promise';
 
-import { saveToFile, ConnectionObject, getPoolConnection } from './helper';
+import { saveToFile, ConnectionObject, getPoolConnection, insertIntoText } from './helper';
 
 type Routine = {
   db: string;
   name: string;
   type: string;
 }
+
+const createTemplate: object = {
+  FUNCTION: /^CREATE .* FUNCTION /,
+  PROCEDURE: /^CREATE .* PROCEDURE /,
+};
 
 export default function routineDump(sqlFilesPath: string, connectionOptions: ConnectionObject) {
 
@@ -40,6 +45,7 @@ export default function routineDump(sqlFilesPath: string, connectionOptions: Con
 
       if (res[0] && res[0][0] && (res[0][0]['Create Function'] || res[0][0]['Create Procedure'])) {
         let createText: string = res[0][0]['Create Function'] ? res[0][0]['Create Function'] : res[0][0]['Create Procedure'];
+        createText = insertIntoText(createText, createTemplate[routine.type.toUpperCase()], `\`${routine.db}\`.`);
         await saveToFile(sqlFilesPath, `${routine.db}/${routine.type}`, `${routine.name}.sql`, createText);
         console.log(`Save ${routine.type} ${routine.db}.${routine.name}`);
       }
