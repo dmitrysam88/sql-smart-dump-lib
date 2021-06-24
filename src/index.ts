@@ -2,8 +2,8 @@ import path from 'path';
 
 import routineDump from './lib/routineDump';
 import tableDump from './lib/tableDump';
-import loadRoutine from './lib/loadRoutine';
-import loadTable from './lib/loadTable';
+import eventDump from './lib/eventDump';
+import loadElement from './lib/loadElement';
 import { ConnectionObject } from './lib/helper';
 
 export default function (connectionOptions: ConnectionObject, sqlFilesPath: string = path.join(__dirname, '../../../sql')) {
@@ -12,7 +12,7 @@ export default function (connectionOptions: ConnectionObject, sqlFilesPath: stri
   return {
     ...routineDump(sqlFilesPath, connectionOptions),
     ...tableDump(sqlFilesPath, connectionOptions),
-    ...loadRoutine(sqlFilesPath, connectionOptions),
-    ...loadTable(sqlFilesPath, connectionOptions),
+    ...eventDump(sqlFilesPath, connectionOptions),
+    ...loadElement(sqlFilesPath, connectionOptions),
   }
 }

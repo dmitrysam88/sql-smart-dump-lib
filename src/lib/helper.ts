@@ -127,9 +127,3 @@ export function insertIntoText(text: string, searchTemplate: string | RegExp, su
 export async function getDirs(path: string) {
   return asyncReadDir(path);
 }
-
-export async function createDBs(db: Pool, dbName: string): Promise<boolean> {
-  await db.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
-  console.log(`Create database ${dbName}`);
-  return true;
-}
