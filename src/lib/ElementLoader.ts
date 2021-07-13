@@ -2,7 +2,7 @@ import { Pool } from 'mysql2/promise';
 
 import { ConnectionObject, getDirFiles, getDirs, getPoolConnection, readFromFile } from './helper';
 
-export default class ElementLoader {
+export class ElementLoader {
 
   protected db: Pool;
   protected sqlFilesPath: string;

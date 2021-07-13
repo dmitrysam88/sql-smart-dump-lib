@@ -12,7 +12,7 @@ const createTemplate: object = {
   PROCEDURE: /^CREATE .* PROCEDURE /,
 };
 
-export default class RoutineDumper extends RootDumper {
+export class RoutineDumper extends RootDumper {
 
   constructor (sqlFilesPath: string, connectionOptions: ConnectionObject) {
     super(sqlFilesPath, connectionOptions);

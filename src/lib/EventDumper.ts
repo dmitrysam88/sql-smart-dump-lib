@@ -10,7 +10,7 @@ type Event = {
 
 const createTemplate: RegExp = /^CREATE .* EVENT /;
 
-export default class EventDumper extends RootDumper {
+export class EventDumper extends RootDumper {
 
   constructor(sqlFilesPath: string, connectionOptions: ConnectionObject) {
     super(sqlFilesPath, connectionOptions);

@@ -10,7 +10,7 @@ type DBTable = {
 
 const createTemplate: string = 'CREATE TABLE ';
 
-export default class TableDumper extends RootDumper {
+export class TableDumper extends RootDumper {
 
   constructor(sqlFilesPath: string, connectionOptions: ConnectionObject) {
     super(sqlFilesPath, connectionOptions);
