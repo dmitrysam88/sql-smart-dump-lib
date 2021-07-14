@@ -14,14 +14,19 @@ const createTemplate: object = {
 
 export class RoutineDumper extends RootDumper {
 
-  constructor (sqlFilesPath: string, connectionOptions: ConnectionObject) {
+  constructor(sqlFilesPath: string, connectionOptions: ConnectionObject) {
     super(sqlFilesPath, connectionOptions);
   }
 
-  private async getRoutine(routineType: string): Promise<Routine[]> {
+  private async getRoutine(routineType: string, dbName: string): Promise<Routine[]> {
     let routineList: Array<Routine>;
+    let res: any;
 
-    const res = await this.db.query(`SHOW ${routineType.toUpperCase()} STATUS;`);
+    if (dbName === 'all') {
+      res = await this.db.query(`SHOW ${routineType.toUpperCase()} STATUS;`);
+    } else {
+      res = await this.db.query(`SHOW ${routineType.toUpperCase()} STATUS WHERE Db = ?;`, [dbName]);
+    }
 
     if (Array.isArray(res[0])) {
       routineList = res[0].map((el) => ({ db: el.Db, name: el.Name, type: el.Type }));
@@ -30,16 +35,16 @@ export class RoutineDumper extends RootDumper {
     return routineList;
   }
 
-  private async getAllRoutine(): Promise<Routine[]> {
-    const res: Array<Array<Routine>> = await Promise.all([this.getRoutine('PROCEDURE'), this.getRoutine('FUNCTION')]);
+  private async getAllRoutine(dbName: string): Promise<Routine[]> {
+    const res: Array<Array<Routine>> = await Promise.all([this.getRoutine('PROCEDURE', dbName), this.getRoutine('FUNCTION', dbName)]);
 
     return res.reduce((acc, el) => acc.concat(el), []);
   }
 
-  public async saveAllRoutines() {
+  public async saveAllRoutines(dbName: string = 'all') {
     await this.initDBConnection();
 
-    let routines: Array<Routine> = await this.getAllRoutine();
+    let routines: Array<Routine> = await this.getAllRoutine(dbName);
 
     await Promise.allSettled(routines.map(async (routine: Routine): Promise<boolean> => {
       const res = await this.db.query(`SHOW CREATE ${routine.type} ${routine.db}.${routine.name};`);

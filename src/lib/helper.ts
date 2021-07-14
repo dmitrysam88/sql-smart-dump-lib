@@ -18,10 +18,16 @@ export type ConnectionObject = {
   database?: string;
 }
 
-export async function getDatabaseList(db: Pool): Promise<string[]> {
+export async function getDatabaseList(db: Pool, dbName: string = 'all'): Promise<string[]> {
   let dbList: Array<string>;
+  let res: any;
 
-  const res = await db.query('SHOW DATABASES;');
+  if (dbName === 'all') {
+    res = await db.query('SHOW DATABASES;');
+  } else {
+    res = await db.query('SHOW DATABASES WHERE `Database` = ?;', [dbName]);
+  }
+
   if (Array.isArray(res[0])) {
     dbList = res[0].map((el) => el.Database);
   }
@@ -66,8 +72,8 @@ async function getDirContentRecursive(path: string, opositeDirFilter: Array<stri
 
     if (elementStat.isDirectory()) {
       if (!opositeDirFilter.includes(dirElement)) {
-        fileList = [ ...fileList, ...(await getDirContentRecursive(elementPath, opositeDirFilter)) ];
-      }      
+        fileList = [...fileList, ...(await getDirContentRecursive(elementPath, opositeDirFilter))];
+      }
     } else {
       fileList.push(elementPath);
     }

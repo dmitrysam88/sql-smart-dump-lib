@@ -88,10 +88,10 @@ export class TableDumper extends RootDumper {
     }));
   }
 
-  public async saveAllTables() {
+  public async saveAllTables(dbName: string = 'all') {
     await this.initDBConnection();
 
-    const dataBases: Array<string> = await getDatabaseList(this.db);
+    const dataBases: Array<string> = await getDatabaseList(this.db, dbName);
     const tables: Array<DBTable> = await this.getAllTables(dataBases);
 
     await this.saveTablesCreate(tables);
@@ -99,10 +99,10 @@ export class TableDumper extends RootDumper {
     await this.closeDBConnection();
   }
 
-  public async saveAllTablesWithData() {
+  public async saveAllTablesWithData(dbName: string = 'all') {
     await this.initDBConnection();
 
-    const dataBases: Array<string> = await getDatabaseList(this.db);
+    const dataBases: Array<string> = await getDatabaseList(this.db, dbName);
     const tables: Array<DBTable> = await this.getAllTables(dataBases);
 
     await this.saveTablesCreate(tables);

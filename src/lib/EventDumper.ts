@@ -36,10 +36,10 @@ export class EventDumper extends RootDumper {
     return tableResp.flat();
   }
 
-  public async saveAllEvents() {
+  public async saveAllEvents(dbName: string = 'all') {
     await this.initDBConnection();
 
-    const dataBases: Array<string> = await getDatabaseList(this.db);
+    const dataBases: Array<string> = await getDatabaseList(this.db, dbName);
     const events: Array<Event> = await this.getAllEvents(dataBases);
 
     await Promise.allSettled(events.map(async (event: Event) => {
