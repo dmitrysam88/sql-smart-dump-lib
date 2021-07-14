@@ -7,7 +7,7 @@ export class ElementLoader {
   protected db: Pool;
   protected sqlFilesPath: string;
   protected connectionOptions: ConnectionObject;
-  
+
   constructor(sqlFilesPath: string, connectionOptions: ConnectionObject) {
     this.connectionOptions = connectionOptions;
     this.sqlFilesPath = sqlFilesPath;

@@ -18,7 +18,7 @@ export class TableDumper extends RootDumper {
 
   private getObjectValue(obj: object, field: string) {
     let value: string | number | null | boolean;
-  
+
     if (typeof obj[field] === 'string') {
       value = `'${obj[field]}'`;
     } else if (typeof obj[field] === 'object' && obj[field] instanceof Date) {
@@ -28,7 +28,7 @@ export class TableDumper extends RootDumper {
     } else {
       value = obj[field]
     }
-  
+
     return value;
   }
 
@@ -37,7 +37,7 @@ export class TableDumper extends RootDumper {
     const fields: Array<string> = queryResult[1].map((field) => field.name);
     const data: Array<object> = queryResult[0];
     const strData: Array<string> = data.map((el: object) => `(${fields.map((field: string) => this.getObjectValue(el, field)).join()})`);
-  
+
     let result: string = `INSERT INTO ${fullTableName} (${fields.join()}) VALUES \n${strData.join(',\n')};`;
     return result;
   }

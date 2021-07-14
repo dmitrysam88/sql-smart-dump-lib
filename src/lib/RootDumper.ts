@@ -12,11 +12,11 @@ export default abstract class RootDumper {
     this.sqlFilesPath = sqlFilesPath;
   }
 
-  protected async initDBConnection () {
+  protected async initDBConnection() {
     this.db = await mysql.createPool(this.connectionOptions);
   }
 
-  protected async closeDBConnection () {
+  protected async closeDBConnection() {
     this.db.end();
   }
 }
