@@ -1,6 +1,6 @@
 import { Pool } from 'mysql2/promise';
 
-import { ConnectionObject, getDirFiles, getDirs, getPoolConnection, readFromFile } from './helper';
+import { ConnectionObject, createDirFilter, getDirFiles, getDirs, getPoolConnection, readFromFile } from './helper';
 
 export class ElementLoader {
 
@@ -31,7 +31,7 @@ export class ElementLoader {
     }
   }
 
-  private async loadAllElements(dirFilter: Array<string>, elementType: string) {
+  private async loadAllElements(dirFilter: RegExp, elementType: string) {
     this.db = await getPoolConnection(this.connectionOptions);
 
     const dbList: Array<string> = await getDirs(this.sqlFilesPath);
@@ -45,16 +45,22 @@ export class ElementLoader {
     this.db.end();
   }
 
-  public async loadAllEvents() {
-    await this.loadAllElements(['TABLE', 'TABLE_DATA', 'PROCEDURE', 'FUNCTION'], 'event');
+  public async loadAllEvents(dbName: string = undefined) {
+    const RegDirFilter = createDirFilter(['EVENT'], dbName);
+    
+    await this.loadAllElements(RegDirFilter, 'event');
   }
 
-  public async loadAllRoutines() {
-    await this.loadAllElements(['TABLE', 'TABLE_DATA', 'EVENT'], 'routine');
+  public async loadAllRoutines(dbName: string = undefined) {
+    const RegDirFilter = createDirFilter(['PROCEDURE', 'FUNCTION'], dbName);
+
+    await this.loadAllElements(RegDirFilter, 'routine');
   }
 
-  public async loadAllTables() {
-    await this.loadAllElements(['PROCEDURE', 'FUNCTION', 'TABLE_DATA', 'EVENT'], 'table');
+  public async loadAllTables(dbName: string = undefined) {
+    const RegDirFilter = createDirFilter(['TABLE'], dbName);
+    
+    await this.loadAllElements(RegDirFilter, 'table');
   }
 
 }

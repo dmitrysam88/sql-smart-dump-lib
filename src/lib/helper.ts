@@ -57,13 +57,19 @@ export async function readFromFile(fullFilePath: string) {
   return undefined;
 }
 
-export async function getDirFiles(path: string, opositeDirFilter: Array<string>) {
+export async function getDirFiles(path: string, dirFilter: RegExp): Promise<string[]> {
   if (!(await asyncExist(path))) return undefined;
 
-  return getDirContentRecursive(path, opositeDirFilter);
+  return (await getDirContentRecursive(path)).filter((filePath: string) => {
+    if (filePath.includes('/.git/')) return false;
+
+    if (!dirFilter || dirFilter.test(filePath)) return true;
+
+    return false;
+  });
 }
 
-async function getDirContentRecursive(path: string, opositeDirFilter: Array<string>) {
+async function getDirContentRecursive(path: string): Promise<string[]> {
   const dirContent: Array<string> = await asyncReadDir(path);
   let fileList: Array<string> = [];
   for (let dirElement of dirContent) {
@@ -71,9 +77,7 @@ async function getDirContentRecursive(path: string, opositeDirFilter: Array<stri
     const elementStat = await asyncLstat(elementPath);
 
     if (elementStat.isDirectory()) {
-      if (!opositeDirFilter.includes(dirElement)) {
-        fileList = [...fileList, ...(await getDirContentRecursive(elementPath, opositeDirFilter))];
-      }
+      fileList = [...fileList, ...(await getDirContentRecursive(elementPath))];
     } else {
       fileList.push(elementPath);
     }
@@ -103,6 +107,26 @@ export function insertIntoText(text: string, searchTemplate: string | RegExp, su
   return spliceString(text, insertPlace, 0, subStr);
 }
 
-export async function getDirs(path: string) {
-  return asyncReadDir(path);
+export async function getDirs(path: string): Promise<string[]> {
+  return (await asyncReadDir(path)).filter((dir) => dir !== '.git');
+}
+
+export function createDirFilter(types: Array<string>, dbName: string = undefined): RegExp {
+  if (!types.length) return;
+
+  let RegDirFilter: RegExp;
+  let typeFilter: string;
+
+  if (types.length === 1) {
+    typeFilter = types[0];
+  } else {
+    typeFilter = `(${types.join('|')})`;
+  }
+  if (dbName) {
+    RegDirFilter = RegExp(`\/${dbName}\/${typeFilter}\/`);
+  } else {
+    RegDirFilter = RegExp(`\/${typeFilter}\/`);
+  }
+
+  return RegDirFilter;
 }
